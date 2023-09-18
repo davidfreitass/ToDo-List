@@ -20,20 +20,22 @@ class ItemTodo(db.Model):
 
 # Decorator serve para uma função atribuir uma nova funcionalidade para outra função
 # Método route faz com que possamos definir uma rota para uma página
-@app.route("/", methods=['GET', 'POST'])
+@app.route("/", methods=["GET"])
 def index():
-    if request.method == 'POST':
-        # Criando um novo objeto ItemTodo e adicionando no banco de dados
-        content = request.form['content']
-        if content.strip != '':
-            new_item = ItemTodo(content=content)
-            db.session.add(new_item)
-            db.session.commit()
-        return redirect("/")
-    else:
-        # Buscando todos os objetos ItemTodo existentes no banco de dados
-        items = ItemTodo.query.all()
-        return items
+    # Buscando todos os objetos ItemTodo existentes no banco de dados
+    items = ItemTodo.query.all()
+    return items
+
+
+@app.route("/post/", methods=["POST"])
+def post():
+    # Criando um novo objeto ItemTodo e adicionando no banco de dados
+    content = request.get_json()
+    if content is None:
+        new_item = ItemTodo(content=content)
+        db.session.add(new_item)
+        db.session.commit()
+    return redirect("/")
 
 
 if __name__ == "__main__":
