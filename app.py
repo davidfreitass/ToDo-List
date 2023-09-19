@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify
 from flask_sqlalchemy import SQLAlchemy
 # Importando o SQLAlchemy para usar juntamente ao Flask
 from marshmallow import Schema, fields
+# Schema é uma biblioteca para validação de estruturas de dados em Python, fields é uma classe que recebe vários tipos de dados
 
 app = Flask(__name__)  # Aplicação principal do Flask
 app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database3.db"
@@ -16,6 +17,7 @@ class ItemTodo(db.Model):
     content = db.Column(db.String(200))
 
 
+# Classe que serve para realizar a serialização do objeto
 class ItemTodoSchema(Schema):
     id = fields.Int(dump_only=True)
     content = fields.Str()
@@ -30,6 +32,7 @@ itemstodo_schema = ItemTodoSchema(many=True)
 def index():
     # Buscando todos os objetos ItemTodo existentes no banco de dados
     items = ItemTodo.query.all()
+    # dump() é usado para escrever objetos serializados Python como dados formatados em JSON em um arquivo
     result = itemstodo_schema.dump(items)
     return {"items": result}
 
