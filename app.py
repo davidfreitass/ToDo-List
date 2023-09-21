@@ -24,11 +24,13 @@ class ItemTodoSchema(Schema):
 
 
 itemstodo_schema = ItemTodoSchema(many=True)
+itemtodo_schema = ItemTodoSchema()
 
 
 # Decorator serve para uma função atribuir uma nova funcionalidade para outra função
 # Método route faz com que possamos definir uma rota para uma página
 @app.route("/", methods=["GET"])
+@app.route("/todo", methods=["GET"])
 def index():
     # Buscando todos os objetos ItemTodo existentes no banco de dados
     items = ItemTodo.query.all()
@@ -37,7 +39,36 @@ def index():
     return {"items": result}
 
 
-@app.route("/post/", methods=["POST"])
+@app.route("/todo/<int:id>", methods=["GET"])
+def get_id(id):
+    item_id = ItemTodo.query.get(id)
+    result = itemtodo_schema.dump(item_id)
+    return {"item": result}
+
+
+# @app.route("/todo/<int:id>", methods=["PUT"])
+# def put(id):
+#     dados_request = request.get_json()
+#     if dados_request is not None:
+#         # Tratando esse objeto e captando somente o necessário
+#         item_updated = ItemTodo(content=dados_request['content'])
+#         item_id = ItemTodo.query.get(id)
+#         result = itemtodo_schema.dump(item_id)
+
+#         return jsonify(
+#             message="Item atualizado com sucesso",
+#             category="success",
+#             data=dados_request,
+#             status=200
+#         )
+#     else:
+#         return jsonify(
+#             message="No send content data",
+#             category="error",
+#             status=404
+#         )
+
+@app.route("/post", methods=["POST"])
 def post():
     # Criando um novo objeto ItemTodo e adicionando no banco de dados
     dados_request = request.get_json()  # Recebendo todo um objeto enviado no POST
