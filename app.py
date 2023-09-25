@@ -58,7 +58,7 @@ def post():
         db.session.add(new_item)
         db.session.commit()
         return jsonify(
-            message="Item adicionado com sucesso",
+            message="Tarefa adicionada com sucesso",
             category="success",
             data=dados_request,
             status=200
@@ -95,6 +95,16 @@ def update_todo(id):
     # Serializando o objeto python em JSON novamente para ser exibido
     result = itemtodo_schema.dump(ItemTodo.query.get(item_updated.id))
     return {"message": "Tarefa atualizada.", "tarefa": result}
+
+
+@app.route("/todo/<int:id>", methods=["DELETE"])
+def delete_todo(id):
+    item = ItemTodo.query.get(id)  # Captando um item específico através do ID
+    db.session.delete(item)  # Deletando este item
+    db.session.commit()
+    result = itemtodo_schema.dump(item)
+    # Exibindo mensagem de sucesso e o item deletado
+    return {"message": "Tarefa deletada com sucesso.", "tarefa": result}
 
 
 if __name__ == "__main__":
