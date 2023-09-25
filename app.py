@@ -47,25 +47,6 @@ def get_id(id):
     return {"item": result}
 
 
-@app.route("/todo/<int:id>", methods=["PUT"])
-def update_todo(id):
-    dados_request = request.get_json()
-    if not dados_request:
-        return {"message": "No input data provided"}, 400
-    try:
-        dados = itemtodo_schema.load(dados_request)
-    except ValidationError as err:
-        return err.messages, 422
-
-    item_updated = ItemTodo.query.get(id)
-    item_updated.content = dados["content"]
-
-    db.session.add(item_updated)
-    db.session.commit()
-    result = itemtodo_schema.dump(ItemTodo.query.get(item_updated.id))
-    return {"message": "Tarefa atualizada.", "tarefa": result}
-
-
 @app.route("/post", methods=["POST"])
 def post():
     # Criando um novo objeto ItemTodo e adicionando no banco de dados
@@ -88,6 +69,32 @@ def post():
             category="error",
             status=404
         )
+
+
+@app.route("/todo/<int:id>", methods=["PUT"])
+def update_todo(id):
+    # Recebendo todo um objeto JSON enviado no body
+    dados_request = request.get_json()
+    if not dados_request:
+        # Retornando um erro se nada for enviado
+        return {"message": "No input data provided"}, 400
+    try:
+        # Desserializando JSON em um objeto python para manipulação
+        dados = itemtodo_schema.load(dados_request)
+    except ValidationError as err:
+        return err.messages, 422
+
+    # Captando apenas o item específico através do ID
+    item_updated = ItemTodo.query.get(id)
+    # Atualizando seu conteúdo por meio do objeto python adquirido anteriormente
+    item_updated.content = dados["content"]
+
+    # Retornando o item atualizado para o banco de dados
+    db.session.add(item_updated)
+    db.session.commit()
+    # Serializando o objeto python em JSON novamente para ser exibido
+    result = itemtodo_schema.dump(ItemTodo.query.get(item_updated.id))
+    return {"message": "Tarefa atualizada.", "tarefa": result}
 
 
 if __name__ == "__main__":
