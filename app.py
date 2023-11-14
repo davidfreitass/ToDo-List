@@ -109,5 +109,5 @@ def delete_todo(id):
 
 if __name__ == "__main__":
     db.create_all()
-    app.run()
+    app.run(host="0.0.0.0", port=5000, threaded=True)
 # Flask só vai rodar se for realmente o arquivo principal de execução
