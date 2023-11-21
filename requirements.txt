@@ -13,3 +13,4 @@ SQLAlchemy==2.0.20
 typing-extensions==4.7.1
 werkzeug==2.3.7
 zipp==3.16.2
+psycopg2

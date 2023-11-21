@@ -1,12 +1,23 @@
+import os
 from flask import Flask, request, jsonify
 # Importando o Flask
 from flask_sqlalchemy import SQLAlchemy
 # Importando o SQLAlchemy para usar juntamente ao Flask
 from marshmallow import Schema, fields, ValidationError
 # Schema é uma biblioteca para validação de estruturas de dados em Python, fields é uma classe que recebe vários tipos de dados
+from sqlalchemy import URL
+
+url_object = URL.create(
+    "postgresql",
+    username=os.getenv('DB_USER'),
+    password=os.getenv('DB_PASS'),  # plain (unescaped) text
+    host=os.getenv('DB_HOST'),
+    database=os.getenv('DB_NAME'),
+)
 
 app = Flask(__name__)  # Aplicação principal do Flask
-app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database3.db"
+# app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database3.db"
+app.config["SQLALCHEMY_DATABASE_URI"] = "postgresql://postgres:root@db:5432/app"
 db = SQLAlchemy(app)
 app.app_context().push()
 # Configurando o banco de dados do SQLAlchemy
