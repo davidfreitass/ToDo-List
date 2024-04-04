@@ -1,4 +1,4 @@
-#!/mnt/e/projetos/exercicio_flask/.venv/bin/python3
+#!/mnt/g/projetos/exercicio_flask/exercicio_flask/.venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

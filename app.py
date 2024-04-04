@@ -1,19 +1,19 @@
-import os
+# import os
 from flask import Flask, request, jsonify
 # Importando o Flask
 from flask_sqlalchemy import SQLAlchemy
 # Importando o SQLAlchemy para usar juntamente ao Flask
 from marshmallow import Schema, fields, ValidationError
 # Schema é uma biblioteca para validação de estruturas de dados em Python, fields é uma classe que recebe vários tipos de dados
-from sqlalchemy import URL
+# from sqlalchemy import URL
 
-url_object = URL.create(
-    "postgresql",
-    username=os.getenv('DB_USER'),
-    password=os.getenv('DB_PASS'),  # plain (unescaped) text
-    host=os.getenv('DB_HOST'),
-    database=os.getenv('DB_NAME'),
-)
+# url_object = URL.create(
+#     "postgresql",
+#     username=os.getenv('DB_USER'),
+#     password=os.getenv('DB_PASS'),  # plain (unescaped) text
+#     host=os.getenv('DB_HOST'),
+#     database=os.getenv('DB_NAME'),
+# )
 
 app = Flask(__name__)  # Aplicação principal do Flask
 # app.config["SQLALCHEMY_DATABASE_URI"] = "sqlite:///database3.db"
@@ -24,12 +24,19 @@ app.app_context().push()
 
 
 class ItemTodo(db.Model):
+    """
+    Classe que irá conter as informações de uma tarefa.
+    """
+
     id = db.Column(db.Integer, primary_key=True)
     content = db.Column(db.String(200))
 
 
-# Classe que serve para realizar a serialização do objeto
 class ItemTodoSchema(Schema):
+    """
+    Classe que serve para realizar a serialização do objeto.
+    """
+
     id = fields.Int(dump_only=True)
     content = fields.Str()
 
@@ -44,23 +51,33 @@ itemtodo_schema = ItemTodoSchema()
 @app.route("/todo", methods=["GET"])
 @app.route("/todo/", methods=["GET"])
 def index():
-    # Buscando todos os objetos ItemTodo existentes no banco de dados
+    """
+    Função que irá buscar todos os objetos ItemTodo(tarefas) existentes no banco de dados.
+    """
+
     items = ItemTodo.query.all()
     # dump() é usado para escrever objetos serializados Python como dados formatados em JSON em um arquivo
     result = itemstodo_schema.dump(items)
     return {"items": result}
 
 
-@app.route("/todo/<int:id>", methods=["GET"])
-def get_id(id):
-    item_id = ItemTodo.query.get(id)
+@app.route("/todo/<int:idx>", methods=["GET"])
+def get_id(idx):
+    """
+    Função que irá buscar um objeto ItemTodo(tarefas) específico(por id) existente no banco de dados.
+    """
+
+    item_id = ItemTodo.query.get(idx)
     result = itemtodo_schema.dump(item_id)
     return {"item": result}
 
 
 @app.route("/post", methods=["POST"])
 def post():
-    # Criando um novo objeto ItemTodo e adicionando no banco de dados
+    """
+    Função que irá criar um novo objeto ItemTodo(tarefa) e adicionar ao banco de dados.
+    """
+
     dados_request = request.get_json()  # Recebendo todo um objeto enviado no POST
     print(dados_request)
     if dados_request is not None:
@@ -82,8 +99,12 @@ def post():
         )
 
 
-@app.route("/todo/<int:id>", methods=["PUT"])
-def update_todo(id):
+@app.route("/todo/<int:idx>", methods=["PUT"])
+def update_todo(idx):
+    """
+    Função que irá atualizar uma tarefa existente no banco de dados através de um objeto JSON enviado pelo cliente.
+    """
+
     # Recebendo todo um objeto JSON enviado no body
     dados_request = request.get_json()
     if not dados_request:
@@ -96,7 +117,7 @@ def update_todo(id):
         return err.messages, 422
 
     # Captando apenas o item específico através do ID
-    item_updated = ItemTodo.query.get(id)
+    item_updated = ItemTodo.query.get(idx)
     # Atualizando seu conteúdo por meio do objeto python adquirido anteriormente
     item_updated.content = dados["content"]
 
@@ -108,9 +129,13 @@ def update_todo(id):
     return {"message": "Tarefa atualizada.", "tarefa": result}
 
 
-@app.route("/todo/<int:id>", methods=["DELETE"])
-def delete_todo(id):
-    item = ItemTodo.query.get(id)  # Captando um item específico através do ID
+@app.route("/todo/<int:idx>", methods=["DELETE"])
+def delete_todo(idx):
+    """
+    Função que irá deletar uma tarefa existente no banco de dados.
+    """
+
+    item = ItemTodo.query.get(idx)  # Captando um item específico através do ID
     db.session.delete(item)  # Deletando este item
     db.session.commit()
     result = itemtodo_schema.dump(item)
