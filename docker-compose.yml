@@ -13,6 +13,8 @@ services:
       - DB_NAME=app
       - DB_USER=postgres
       - DB_PASS=root
+    volumes:
+      - pg-data:/app
     networks:
       - mynetwork
     depends_on:
@@ -29,7 +31,12 @@ services:
       - mynetwork
     ports:
       - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql
 
 networks:
   mynetwork:
     driver: bridge
+
+volumes:
+  pg-data:
